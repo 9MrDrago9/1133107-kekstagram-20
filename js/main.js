@@ -40,18 +40,26 @@ var DESCRIPTIONS = [
   'Горы',
   'Чудо'
 ];
-var pictureTemplate = document.querySelector('#picture')
-.content
-.querySelector('.picture');
 
+var pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
 var picturesList = document.querySelector('.pictures');
+var bigPicture = document.querySelector('.big-picture');
+var commentList = document.querySelector('.social__comments');
+var commentItem = document.querySelector('.social__comment');
+bigPicture.classList.remove('hidden');
+
+var makeBlocksHidden = function () {
+  document.querySelector('.social__comment-count').classList.add('hidden');
+  document.querySelector('.comments-loader').classList.add('hidden');
+};
 
 var getRandomNumber = function (min, max) {
   return Math.floor(min + Math.random() * max);
 };
 
 var getRandomElement = function (arr) {
-  return Math.floor(Math.random() * arr);
+  var i = Math.floor(Math.random() * arr.length);
+  return arr[i];
 };
 
 var getComment = function () {
@@ -75,7 +83,7 @@ var getPhoto = function (number) {
     url: 'photos/' + getRandomNumber(1, number) + '.jpg',
     description: getRandomElement(DESCRIPTIONS),
     likes: getRandomNumber(MIN_LIKES, MAX_LIKES),
-    comments: getComments()
+    comments: getComments().length
   };
 };
 
@@ -86,7 +94,6 @@ var getPhotos = function () {
   }
   return photos;
 };
-
 
 var createPictureElement = function (photo) {
 
@@ -109,4 +116,39 @@ var renderPicture = function () {
   picturesList.appendChild(fragment);
 };
 
+var createCommentElement = function (comment) {
+
+  var newComment = commentItem.cloneNode(true);
+
+  newComment.querySelector('.social__picture').src = comment.avatar;
+  newComment.querySelector('.social__picture').alt = comment.name;
+  newComment.querySelector('.social__text').textContent = comment.message;
+
+  return newComment;
+};
+
+var renderComments = function () {
+  var commentArray = getComments();
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < commentArray.length; i++) {
+    fragment.appendChild(createCommentElement(commentArray[i]));
+  }
+
+  commentList.appendChild(fragment);
+};
+
+var renderBigPicture = function () {
+  var photoData = getPhotos();
+
+  bigPicture.querySelector('.big-picture__img').querySelector('img').src = photoData[0].url;
+  bigPicture.querySelector('.likes-count').textContent = photoData[0].likes;
+  bigPicture.querySelector('.comments-count').textContent = photoData[0].comments;
+  bigPicture.querySelector('.social__caption').textContent = photoData[0].description;
+
+  document.querySelector('body').classList.add('modal-open');
+};
+
 renderPicture();
+makeBlocksHidden();
+renderBigPicture();
+renderComments();
